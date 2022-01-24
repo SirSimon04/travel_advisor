@@ -11,20 +11,24 @@ function App() {
   const [places, setPlaces] = useState([]);
 
   const [coordinates, setCoordinates] = useState({});
-  const [bounds, setBounds] = useState(null);
+  const [bounds, setBounds] = useState({});
 
   useEffect(() => {
+    console.log("getting pos");
     navigator.geolocation.getCurrentPosition(({coords: {latitude, longitude} }) => {
+      console.log("got pos");
+      console.log(latitude);
       setCoordinates({ lat: latitude, lng: longitude });
     })
   }, []);
 
   useEffect(() => {
-    console.log(coordinates, bounds);
-    getPlacesData().then((data) => {
-      console.log(data);
+    // let isMounted = true;
+    getPlacesData(bounds.sw, bounds.ne).then((data) => {
+      // if (isMounted) setPlaces(data);
       setPlaces(data);
     });
+    // return () => { isMounted = false };
   }, [coordinates, bounds]);
 
   return (
@@ -33,7 +37,7 @@ function App() {
       <Header />
       <Grid container spacing={3} style={{width: "100%"}} >
         <Grid item xs={12} md={4}>
-          <List />
+          <List places={places}/>
         </Grid>
         <Grid item xs={12} md={8}>
           <Map setCoordinates={setCoordinates} setBounds={setBounds} coordinates={coordinates}/>
