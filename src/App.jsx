@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CssBaseline, Grid } from "@material-ui/core";
 
-import { getPlacesData } from "./api";
+import { getPlacesData, getWeatherData } from "./api";
 import Header from "./components/Header/Header";
 import List from "./components/List/List";
 import Map from "./components/Map/Map";
@@ -21,6 +21,8 @@ function App() {
   const [type, setType] = useState("restaurants");
   const [rating, setRating] = useState(0);
 
+  const [weatherData, setWeatherData] = useState([]);
+
   useEffect(() => {
     console.log("getting pos");
     console.log("use effect 2");
@@ -37,20 +39,24 @@ function App() {
   }, [rating]);
 
   useEffect(() => {
-    console.log("use effect 1");
-    // let isMounted = true;
-    setIsLoading(true);
-    getPlacesData(type, bounds.sw, bounds.ne).then((data) => {
-      setPlaces(data);
-      setIsLoading(false);
-      setFilteredPlaces([]);
-    });
-  }, [coordinates, bounds, type]);
+    if(bounds.sw && bounds.ne){
+      console.log("use effect 1");
+      setIsLoading(true);
+
+      getWeatherData(coordinates.lat, coordinates.lng).then((data) => setWeatherData(data));
+
+      getPlacesData(type, bounds.sw, bounds.ne).then((data) => {
+        setPlaces(data?.filter((place) => place.name && place.num_reviews > 0));
+        setIsLoading(false);
+        setFilteredPlaces([]);
+      });
+    }
+  }, [bounds, type]);
 
   return (
   <div>
       <CssBaseline />
-      <Header />
+      <Header setCoordinates={setCoordinates} />
       <Grid container spacing={3} style={{width: "100%"}} >
         <Grid item xs={12} md={4}>
           <List
@@ -70,6 +76,7 @@ function App() {
             coordinates={coordinates}
             places={filteredPlaces.length ? filteredPlaces : places}
             setChildClicked={setChildClicked}
+            weatherData={weatherData}
           />
         </Grid>
       </Grid>
