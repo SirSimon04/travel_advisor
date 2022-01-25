@@ -4,6 +4,8 @@ import { Paper, Typography, useMediaQuery } from "@material-ui/core";
 import LocationOnOutlinedIcon from "@material-ui/icons/LocationOnOutlined";
 import {Rating} from "@material-ui/lab";
 
+import mapStyles from "./mapStyles"
+
 import useStyles from "./styles";
 
 function Map({setCoordinates, setBounds, coordinates, places, setChildClicked, weatherData }) {
@@ -16,16 +18,18 @@ function Map({setCoordinates, setBounds, coordinates, places, setChildClicked, w
   //
   // console.log("http://openweathermap.org/image/w/" + weatherData.list[0].weather[0].icon + ".png");
 
+  // console.log({mapStyles})
+
   return (
     <div className={classes.mapContainer}>
       <GoogleMapReact
-        bootstrapURLKeys={{key: "AIzaSyAaAu1WhEhUPxamZ7iAcsMVVocNeceadhU"}}
+        bootstrapURLKeys={{key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY }}
         // defaultCenter={coordinates}
         center={coordinates}
         defaultCenter={coordinates}
         defaultZoom={14}
         margin={[50, 50, 50, 50]}
-        options={""}
+        options={{ disableDefaultUI: true, zoomControl: true, styles: mapStyles}}
         onChange={(e) => {
           setCoordinates({ lat: e.center.lat, lng: e.center.lng });
           setBounds({ ne: e.marginBounds.ne, sw: e.marginBounds.sw });
